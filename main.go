@@ -14,13 +14,14 @@ func main() {
 
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
 
-	hh := handlers.NewHello(l)
-	gh := handlers.NewGoodbye(l)
+	// Create the handler
+	ph := handlers.NewProducts(l)
 
+	// Create a new server mux and register mux
 	sm := http.NewServeMux()
-	sm.Handle("/", hh)
-	sm.Handle("/goodbye", gh)
+	sm.Handle("/products", ph)
 
+	// Create a new server
 	s := &http.Server{
 		Addr:         ":9000",
 		Handler:      sm,
@@ -36,6 +37,7 @@ func main() {
 		}
 	}()
 
+	// trap sigterm or interrupt nd gracefully signal
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt)
 	signal.Notify(sigChan, os.Kill)
