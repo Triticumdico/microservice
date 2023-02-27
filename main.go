@@ -20,6 +20,7 @@ func main() {
 	// Create a new server mux and register mux
 	sm := http.NewServeMux()
 	sm.Handle("/products", ph)
+	sm.Handle("/", ph)
 
 	// Create a new server
 	s := &http.Server{
