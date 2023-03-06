@@ -1,3 +1,17 @@
+// Package classification of Product API
+//
+// # Documentation for Product API
+//
+// Schemes: http
+// BasePath: /
+// Version: 1.0.0
+//
+// Consumes:
+// - application/json
+//
+// Produces:
+// - application/json
+// swagger:meta
 package handlers
 
 import (
@@ -6,55 +20,35 @@ import (
 	"log"
 	"microservice/data"
 	"net/http"
-	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
+// A list of products returns in the response
+// swagger:response productsResponse
+type productsResponseWrapper struct {
+	// All products in  the system
+	// in: body
+	Body []data.Product
+}
+
+// swagger:parameters deleteProduct
+type productIdParameterWrapper struct {
+	// The id of the product to delete from the database
+	// in: path
+	// required: true
+	ID int `json:"id"`
+}
+
+// Products is a http.Handler
 type Products struct {
 	l *log.Logger
 }
 
-type KeyProduct struct{}
-
+// NewProducts creates a products handler with a given logger
 func NewProducts(l *log.Logger) *Products {
 	return &Products{l}
 }
 
-func (p *Products) GetProducts(rw http.ResponseWriter, r *http.Request) {
-	p.l.Println("Handel GET Products")
-
-	lp := data.GetProducts()
-
-	err := lp.ToJSON(rw)
-	if err != nil {
-		http.Error(rw, "Enable to marshal JSON", http.StatusBadRequest)
-	}
-}
-
-func (p *Products) PostProducts(rw http.ResponseWriter, r *http.Request) {
-	p.l.Println("Handel POST Products")
-
-	prod := r.Context().Value(KeyProduct{}).(data.Product)
-	data.AddProduct(&prod)
-}
-
-func (p *Products) UpdateProducts(rw http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		http.Error(rw, "Enable to convert id", http.StatusBadRequest)
-		return
-	}
-
-	p.l.Println("Handel PUT Products")
-	prod := r.Context().Value(KeyProduct{}).(data.Product)
-
-	err = data.UpdateProduct(id, &prod)
-	if err != nil {
-		http.Error(rw, "Product not found", http.StatusBadRequest)
-	}
-}
+type KeyProduct struct{}
 
 func (p Products) MiddlewareProductValidation(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {

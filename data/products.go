@@ -11,6 +11,7 @@ import (
 )
 
 // Product defines the structure for an API product
+// swagger:model
 type Product struct {
 	ID          int     `json:"id"`
 	Name        string  `json:"name" validate:"required"`
@@ -71,6 +72,17 @@ func UpdateProduct(id int, p *Product) error {
 
 	p.ID = id
 	productList[pos] = p
+
+	return nil
+}
+
+func DeleteProduct(id int) error {
+	_, pos, err := findProduct(id)
+	if err != nil {
+		return err
+	}
+
+	productList[pos] = &Product{}
 
 	return nil
 }
